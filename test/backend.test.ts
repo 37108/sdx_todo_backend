@@ -1,13 +1,10 @@
-import { expect as expectCDK, MatchStyle, matchTemplate } from '@aws-cdk/assert';
+import { countResources, expect as expectCDK } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
 import * as Backend from '../lib/backend';
 
-test('Empty Stack', () => {
+test('Stack has constructor', () => {
     const app = new cdk.App();
-    // WHEN
     const stack = new Backend.BackendStack(app, 'MyTestStack');
-    // THEN
-    expectCDK(stack).to(matchTemplate({
-      "Resources": {}
-    }, MatchStyle.EXACT))
+
+    expectCDK(stack).to(countResources('AWS::DynamoDB::Table', 1));
 });
