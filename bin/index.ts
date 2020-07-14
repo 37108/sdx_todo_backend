@@ -4,4 +4,8 @@ import 'source-map-support/register';
 import { BackendStack } from '../lib/backend';
 
 const app = new cdk.App();
-new BackendStack(app, 'BackendStack');
+new BackendStack(app, 'BackendStack', {
+  env: {
+    region: 'us-east-1',
+  },
+});

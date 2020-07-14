@@ -9,11 +9,11 @@ export class BackendStack extends cdk.Stack {
       tableName: 'tasks',
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       partitionKey: {
-        name: 'id',
+        name: 'user',
         type: ddb.AttributeType.STRING,
       },
       sortKey: {
-        name: 'user',
+        name: 'id',
         type: ddb.AttributeType.STRING,
       },
     })
