@@ -1,0 +1,91 @@
+openapi: 3.0.2
+info:
+  title: todo application backend
+  description: CRUD todo application backend
+  version: '1'
+paths:
+  /v1/tasks:
+    get:
+      description: lists all tasks sorted by a user
+      parameters:
+        - in: query
+          required: true
+          description: user id
+          name: user_id
+          schema:
+            type: string
+      responses:
+        200:
+          description: returns all tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      description: create a new task
+      parameters:
+        - in: query
+          required: true
+          description: user id
+          name: user_id
+          schema:
+            type: string
+        - in: query
+          description: task title
+          name: title
+          schema:
+            type: string
+        - in: query
+          description: task note
+          name: note
+          schema:
+            type: string
+        - in: query
+          description: is task completed
+          name: completed
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: returns the created task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+components:
+  schemas:
+    Task:
+      required:
+        - id
+      type: object
+      properties:
+        user:
+          type: string
+          description: user id. primary key
+          example: xxxx-xxxx-xxxx
+        id:
+          type: string
+          description: task id. sort key
+          example: yyyy-yyyy-yyyy
+        title:
+          type: string
+          description: task title
+          example: example task
+        note:
+          type: string
+          description: task note
+          example: lorem ipsum
+        completed:
+          type: boolean
+          description: task is finished or not
+          example: lorem ipsum
+        created:
+          type: integer
+          description: task created time
+          example: 1594775818
+        updated:
+          type: integer
+          description: task last updated time
+          example: 1594775818

@@ -6,8 +6,8 @@ import { PutItemInput, QueryInput } from 'aws-sdk/clients/dynamodb';
  * attributes about tasks table
  */
 export interface Task {
-  id: string;
   user: string;
+  id: string;
   title?: string;
   note?: string;
   completed?: boolean;
@@ -22,7 +22,6 @@ export interface Task {
 export class TasksTable {
   private readonly db: DynamoDB;
   private readonly table = 'tasks';
-
   constructor(db: DynamoDB) {
     this.db = db;
   }
@@ -52,6 +51,8 @@ export class TasksTable {
    * @param task task info
    */
   async putNewTask(task: Task): Promise<Task> {
+    const currentDate = Date.now()
+    const taskID = 'xxxx'
     const params: PutItemInput = {
       TableName: this.table,
       Item: {
@@ -59,8 +60,23 @@ export class TasksTable {
           S: task.user,
         },
         id: {
-          S: task.id,
-        }
+          S: taskID,
+        },
+        created: {
+          N: currentDate.toString(),
+        },
+        updated: {
+          N: currentDate.toString(),
+        },
+        title: {
+          S: task.title,
+        },
+        note: {
+          S: task.note,
+        },
+        completed: {
+          B: task.completed,
+        },
       }
     }
     await this.db.putItem(params).promise();
