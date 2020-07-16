@@ -1,3 +1,8 @@
+/**
+ * todo
+ * switching to ddb doc client
+ * https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#get-property
+ */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { DynamoDB } from 'aws-sdk';
 import { PutItemInput, QueryInput } from 'aws-sdk/clients/dynamodb';
@@ -7,7 +12,7 @@ import { PutItemInput, QueryInput } from 'aws-sdk/clients/dynamodb';
  */
 export interface Task {
   user: string;
-  id: string;
+  id?: string;
   title?: string;
   note?: string;
   completed?: boolean;
@@ -20,9 +25,9 @@ export interface Task {
  * attributes are defined by Tasks interface.
  */
 export class TasksTable {
-  private readonly db: DynamoDB;
+  private readonly db: DynamoDB.DocumentClient;
   private readonly table = 'tasks';
-  constructor(db: DynamoDB) {
+  constructor(db: DynamoDB.DocumentClient) {
     this.db = db;
   }
 
@@ -75,7 +80,7 @@ export class TasksTable {
           S: task.note,
         },
         completed: {
-          B: task.completed,
+          BOOL: task.completed,
         },
       }
     }
@@ -90,7 +95,7 @@ export class TasksTable {
  * @param context Lambda Context
  */
 export async function handler(event: APIGatewayProxyEvent, context: Context):Promise<APIGatewayProxyResult>{
-  const db = new DynamoDB({
+  const db = new DynamoDB.DocumentClient({
     apiVersion: '2012-08-10',
     region: 'us-east-1',
   });
