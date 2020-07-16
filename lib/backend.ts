@@ -25,7 +25,7 @@ export class BackendStack extends cdk.Stack {
     const getTasks = new Function(this, 'getTasksFunction', {
       runtime: Runtime.NODEJS_12_X,
       handler: 'index.handler',
-      code: Code.fromAsset(resolve(__dirname, '../lambda/tasks_by_user/'),),
+      code: Code.fromAsset(resolve(__dirname, '../lambda/tasks_by_user/.build'),),
     })
 
     const getTasksIntegration = new LambdaProxyIntegration({
