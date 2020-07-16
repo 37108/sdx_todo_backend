@@ -98,6 +98,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context):Pro
   const res = await tasksTable.listTasksByUser('test'); // switch test to user id from event.
   const response: APIGatewayProxyResult = {
     statusCode: 200,
+    isBase64Encoded: false,
     body: JSON.stringify(res),
     headers: {
       'Content-Type': 'application/json',

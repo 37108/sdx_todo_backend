@@ -27,6 +27,7 @@ export class BackendStack extends cdk.Stack {
       handler: 'index.handler',
       code: Code.fromAsset(resolve(__dirname, '../lambda/tasks_by_user/.build'),),
     })
+    tasksTable.grantReadData(getTasks);
 
     const getTasksIntegration = new LambdaProxyIntegration({
       handler: getTasks,
