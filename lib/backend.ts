@@ -28,9 +28,18 @@ export class BackendStack extends cdk.Stack {
       code: Code.fromAsset(resolve(__dirname, '../lambda/tasks_by_user/.build'),),
     })
     tasksTable.grantReadData(getTasks);
-
     const getTasksIntegration = new LambdaProxyIntegration({
       handler: getTasks,
+    })
+
+    const postTasks = new Function(this, 'postTasksFunction', {
+      runtime: Runtime.NODEJS_12_X,
+      handler: 'index.handler',
+      code: Code.fromAsset(resolve(__dirname, '../lambda/new_task/.build'),),
+    })
+    tasksTable.grantWriteData(getTasks);
+    const postTasksIntegration = new LambdaProxyIntegration({
+      handler: postTasks,
     })
 
     const api = new HttpApi(this, 'api', {})
@@ -38,6 +47,11 @@ export class BackendStack extends cdk.Stack {
       path: '/tasks',
       methods: [ HttpMethod.GET],
       integration: getTasksIntegration,
+    })
+    api.addRoutes({
+      path: '/tasks',
+      methods: [ HttpMethod.POST],
+      integration: postTasksIntegration,
     })
   }
 }
