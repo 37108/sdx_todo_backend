@@ -35,7 +35,7 @@ export class BackendStack extends cdk.Stack {
 
     const api = new HttpApi(this, 'api', {})
     api.addRoutes({
-      path: '/task',
+      path: '/tasks',
       methods: [ HttpMethod.GET],
       integration: getTasksIntegration,
     })
