@@ -1,11 +1,5 @@
-/**
- * todo
- * switching to ddb doc client
- * https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#get-property
- */
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { DynamoDB } from 'aws-sdk';
-import { PutItemInput, QueryInput } from 'aws-sdk/clients/dynamodb';
 
 /**
  * attributes about tasks table
@@ -25,10 +19,10 @@ export interface Task {
  * attributes are defined by Tasks interface.
  */
 export class TasksTable {
-  private readonly db: DynamoDB.DocumentClient;
+  private readonly client: DynamoDB.DocumentClient;
   private readonly table = 'tasks';
-  constructor(db: DynamoDB.DocumentClient) {
-    this.db = db;
+  constructor(client: DynamoDB.DocumentClient) {
+    this.client = client;
   }
 
   /**
@@ -36,15 +30,15 @@ export class TasksTable {
    * @param user user id
    */
   async listTasksByUser(user: string): Promise<any[]> {
-    const params: QueryInput = {
+    const params: DynamoDB.DocumentClient.QueryInput = {
       TableName: this.table,
-      ExpressionAttributeNames:{'#u': 'user'},
+      ExpressionAttributeNames: {'#u': 'user'},
       ExpressionAttributeValues: {
-        ':value': { S: user},
+        ':pk': user,
       },
-      KeyConditionExpression: '#u = :value',
+      KeyConditionExpression: '#u = :pk',
     };
-    const response = await this.db.query(params).promise();
+    const response = await this.client.query(params).promise();
     if (response.Items == undefined) {
       return []
     };
@@ -55,37 +49,24 @@ export class TasksTable {
    * create a new task.
    * @param task task info
    */
-  async putNewTask(task: Task): Promise<Task> {
+  async putNewTask(task: Task): Promise<any> {
     const currentDate = Date.now()
     const taskID = 'xxxx'
-    const params: PutItemInput = {
+    const params: DynamoDB.DocumentClient.PutItemInput = {
       TableName: this.table,
+      ReturnValues: 'ALL_OLD',
       Item: {
-        user: {
-          S: task.user,
-        },
-        id: {
-          S: taskID,
-        },
-        created: {
-          N: currentDate.toString(),
-        },
-        updated: {
-          N: currentDate.toString(),
-        },
-        title: {
-          S: task.title,
-        },
-        note: {
-          S: task.note,
-        },
-        completed: {
-          BOOL: task.completed,
-        },
+        user: task.user,
+        id: taskID,
+        created: currentDate,
+        updated: currentDate,
+        title:task.title,
+        note: task.note,
+        completed: task.completed,
       }
     }
-    await this.db.putItem(params).promise();
-    return task;
+    await this.client.put(params).promise();
+    return params.Item;
   }
 }
 
@@ -95,11 +76,11 @@ export class TasksTable {
  * @param context Lambda Context
  */
 export async function handler(event: APIGatewayProxyEvent, context: Context):Promise<APIGatewayProxyResult>{
-  const db = new DynamoDB.DocumentClient({
+  const client = new DynamoDB.DocumentClient({
     apiVersion: '2012-08-10',
     region: 'us-east-1',
   });
-  const tasksTable = new TasksTable(db);
+  const tasksTable = new TasksTable(client);
   const res = await tasksTable.listTasksByUser('test'); // switch test to user id from event.
   const response: APIGatewayProxyResult = {
     statusCode: 200,
