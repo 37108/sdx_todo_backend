@@ -1,4 +1,4 @@
-import { HttpApi, HttpMethod, LambdaProxyIntegration /**CfnAuthorizer**/ } from '@aws-cdk/aws-apigatewayv2';
+import { CfnAuthorizer, HttpApi, HttpMethod, LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2';
 import { AttributeType, Table } from '@aws-cdk/aws-dynamodb';
 import { Code, Function, Runtime } from '@aws-cdk/aws-lambda';
 import * as cdk from '@aws-cdk/core';
@@ -52,6 +52,16 @@ export class BackendStack extends cdk.Stack {
       path: '/tasks',
       methods: [ HttpMethod.POST],
       integration: postTasksIntegration,
+    })
+    new CfnAuthorizer(this, 'authorizer', {
+      name: 'todo-authorizer',
+      apiId: api.httpApiId,
+      identitySource: ['$request.header.Authorization'],
+      authorizerType: 'JWT',
+      jwtConfiguration: {
+        audience: ['https://ebf8jvpys3.execute-api.us-east-1.amazonaws.com/v1'],
+        issuer: 'https://37108.auth0.com/.well-known/jwks.json',
+      },
     })
   }
 }
