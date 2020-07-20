@@ -7,6 +7,8 @@ paths:
   /v1/tasks:
     get:
       description: lists all tasks sorted by a user
+      security:
+        - openID: []
       parameters:
         - in: query
           required: true
@@ -25,6 +27,8 @@ paths:
                   $ref: '#/components/schemas/Task'
     post:
       description: create a new task
+      security:
+        - openID: []
       parameters:
         - in: query
           required: true
@@ -89,3 +93,9 @@ components:
           type: integer
           description: task last updated time
           example: 1594775818
+  securitySchemes:
+    openID:
+      type: openIdConnect
+      openIdConnectUrl: https://37108.auth0.com/.well-known/jwks.json
+security:
+  - openID: []
